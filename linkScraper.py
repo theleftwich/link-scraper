@@ -38,7 +38,7 @@ class Client(object):
         source = type(self).__name__
         return self._get_auth_token(self.email, self.password, source, service="wise")
 
-    def download(self, spreadsheet, gid=0, format="csv"):
+    def download(self, spreadsheet, gid=1, format="csv"):
         url_format = "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=%s&exportFormat=%s&gid=%i"
         headers = {
             "Authorization": "GoogleLogin auth=" + self.get_auth_token(),
@@ -51,10 +51,11 @@ if __name__ == "__main__":
     import getpass
     import csv
 
-    email = "leftwich@umich.edu" 
+    email = "leftwich@umich.edu" #google docs login
+    print "Please enter your Google docs password:"
     password = getpass.getpass()
 	
-    spreadsheet_id = "0Ame82JMHWKQgdHdDQm02RW1kNVlKV2lLVlpDbG5aV3c" # (spreadsheet id here)
+    spreadsheet_id = "0AinMDATKswMWdGJraFQtRTBMSWt3bFgzRjV4clZuNUE" # (spreadsheet id here)
 
     # Create client and spreadsheet objects
     gs = Client(email, password)
@@ -98,7 +99,8 @@ br.open('https://weblogin.umich.edu/')
 br.select_form(nr=0)
 
 # User credentials
-br.form['login'] = 'leftwich'
+br.form['login'] = 'leftwich' #umich login
+print "Please enter your CMS password"
 br.form['password'] = getpass.getpass()
 
 
@@ -110,7 +112,7 @@ br.submit()
 # specify path to file and file variables
 from os.path import join as pjoin
 path_to_folder = pjoin('C:\\', 'Users', 'leftwich', 'Documents', 'scraper')
-filename = 'aeroLinkScraper_080713_2.csv'
+filename = 'scraper03_test.csv'
 
 # open a file to write results in
 outputFile = open(path_to_folder + '\\' + filename, 'a')
