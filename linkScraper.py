@@ -52,10 +52,10 @@ if __name__ == "__main__":
     import csv
 
     print "\n"
-    print " First, the script will log in to Google Docs.\n"
-    email = raw_input(' Please enter your Google Docs email address: ')
-    print "/n"
-    print " Now enter your Google Docs password at the prompt.\n"
+    print ">>>> First, the script will log in to Google Docs.\n"
+    email = raw_input('Please enter your Google Docs email address (e.g., leftwich@umich.edu)\nEmail: ')
+    print "\n"
+    print "Now enter your Google Docs password at the prompt."
     password = getpass.getpass()
 	
     spreadsheet_id = "0AinMDATKswMWdGJraFQtRTBMSWt3bFgzRjV4clZuNUE" # (spreadsheet id here)
@@ -74,6 +74,9 @@ import mechanize
 import cookielib
 from bs4 import BeautifulSoup
 
+#initialize variables...
+error_code = "ok"
+error_args = "ok"
 
 # Browser
 br = mechanize.Browser()
@@ -104,10 +107,10 @@ br.select_form(nr=0)
 # User credentials
 br.form['login'] = 'leftwich' #umich login
 print "\n"
-print " Now, the script will log in to the CMS.\n"
-br.form['login'] = raw_input(' Please enter your Google Docs email address: ')
-print "/n"
-print " Please enter your CMS password at the prompt.\n"
+print ">>>> Now, the script will log in to the CMS.\n"
+br.form['login'] = raw_input('Please enter your CMS login name (e.g., leftwich):\nLogin: ')
+print "\n"
+print "Please enter your CMS password at the prompt."
 br.form['password'] = getpass.getpass()
 
 
@@ -139,9 +142,7 @@ urls = csv.reader(csv_file)
 for url in urls:
     response = br.open(url[0])
     fullHTML = response.read()
-
-
-    
+	
 	# put the HTML into BeautifulSoup
     soup = BeautifulSoup(fullHTML)
 
@@ -159,15 +160,51 @@ for url in urls:
         for link in content_div.findAll('a'):
             h = link.get('href')
             if h is not None and h.startswith('#')==False and 'mailto' not in h:
-                outputFile.write ('"' + (url[0]) + '","' + link.get('href') + '"' + '\n')
+			    #follow link and check for 404s or server errors
+                if h.startswith("/"):
+                    fullURL = ('http://www.engin.umich.edu' + h)
+                else:
+                    fullURL = h
+    
+                try:		
+                    pageResponse = br.open(fullURL)
+				
+                except (mechanize.HTTPError,mechanize.URLError) as e:
+                    if isinstance(e,mechanize.HTTPError):
+                        error_code = str(e.code)
+                    else:
+                        error_args = str(e.reason.args)
+                        						
+                
+                outputFile.write ('"' + (url[0]) + '","' + link.get('href')  + '","' + error_code + '","' + error_args + '"' + '\n')
 	
+
 	
 	# get all the links from div#rightPortlets, write each to a line of a .csv file
     if portlet_div is not None:
         for link in content_div.findAll('a'):
             h = link.get('href')
             if h is not None and h.startswith('#')==False and 'mailto' not in h:
-                outputFile.write ('"' + (url[0]) + '","' + link.get('href') + '"' + '\n')
+			    #follow link and check for 404s or server errors
+                if h.startswith("/"):
+                    fullURL = ('http://www.engin.umich.edu' + h)
+                else:
+                    fullURL = h
+    
+                try:		
+                    pageResponse = br.open(fullURL)
+				
+                except (mechanize.HTTPError,mechanize.URLError) as e:
+                    if isinstance(e,mechanize.HTTPError):
+                        error_code = str(e.code)
+                    else:
+                        error_args = str(e.reason.args)
+                        						
+                #write source url, link url, error code, error arg
+                outputFile.write ('"' + (url[0]) + '","' + link.get('href')  + '","' + error_code + '","' + error_args + '"' + '\n')
+				
+    
+	
 
 outputFile.close()    
 
