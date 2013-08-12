@@ -51,8 +51,11 @@ if __name__ == "__main__":
     import getpass
     import csv
 
-    email = "leftwich@umich.edu" #google docs login
-    print "Please enter your Google docs password:"
+    print "\n"
+    print " First, the script will log in to Google Docs.\n"
+    email = raw_input(' Please enter your Google Docs email address: ')
+    print "/n"
+    print " Now enter your Google Docs password at the prompt.\n"
     password = getpass.getpass()
 	
     spreadsheet_id = "0AinMDATKswMWdGJraFQtRTBMSWt3bFgzRjV4clZuNUE" # (spreadsheet id here)
@@ -81,7 +84,7 @@ br.set_cookiejar(cj)
 
 # Browser options
 br.set_handle_equiv(True)
-br.set_handle_gzip(True)
+#br.set_handle_gzip(True)
 br.set_handle_redirect(True)
 br.set_handle_referer(True)
 br.set_handle_robots(False)
@@ -100,7 +103,11 @@ br.select_form(nr=0)
 
 # User credentials
 br.form['login'] = 'leftwich' #umich login
-print "Please enter your CMS password"
+print "\n"
+print " Now, the script will log in to the CMS.\n"
+br.form['login'] = raw_input(' Please enter your Google Docs email address: ')
+print "/n"
+print " Please enter your CMS password at the prompt.\n"
 br.form['password'] = getpass.getpass()
 
 
