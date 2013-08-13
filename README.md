@@ -10,6 +10,6 @@ This link scraper will:
 
 How to use this program
 ----------------------------------
-Right-click on linkScraper.zip and save it somewhere. Unzip it, open the directory, and double-click on linkScraper.exe.
+Click on linkScraper.zip. This will take you to a page with a big gray box with a "View Raw" link in it. Right-click on that link and save it.
 
 You will need to have a Google spreadsheet of links you want to scrape.
