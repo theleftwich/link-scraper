@@ -4,12 +4,67 @@
 # certain criteria from div#content and div#rightPortlets and write them 
 # to a CSV
 
-# don't forget to specify email addres for logging into Google Docs, paths and filenames to store your CSV!
+###########################################################################################
+
+
+# Initilize gui, get values from user
+
+# imports
+import easygui as eg
+import re
+
+msg         = "This program will grab links from the body and sidebars, test them, and store the information in a CSV in the C:\scraper directory."
+title       = "Link Scraper/Tester v. 0.5"
+fieldNames  = ["Google Docs Spreadsheet URL","U-M email address (ex. bob@umich.edu)","Name of output file (must end in .csv)","CMS Password"]
+fieldValues = []  # we start with blanks for the values
+fieldValues = eg.multpasswordbox(msg,title, fieldNames)
+
+# make sure that none of the fields was left blank
+while 1:  # do forever, until we find acceptable values and break out
+    errmsg = ""
+    if fieldValues == None: 
+        break
+
+    
+    # look for errors in the returned values
+    for i in range(len(fieldNames)):
+        if fieldValues[i].strip() == "":
+            errmsg = errmsg + ('"%s" is a required field.\n\n' % fieldNames[i])
+        
+    if errmsg == "": 
+        break # no problems found
+    else:
+        # show the box again, with the errmsg as the message    
+        fieldValues = eg.multenterbox(errmsg, title, fieldNames, fieldValues)
+
+
+# process these inputs for later use
+CMS_login = fieldValues[1].replace("@umich.edu","") #removes @umich.edu to get username for CMS login
+
+# get spreadsheet id
+key_ex = re.compile('key=([^#]*)')		
+spreadsheet_list = re.findall(key_ex,fieldValues[0])
+spreadsheet_key = spreadsheet_list[0]
+
+#get gid
+gid_ex = re.compile('gid=([^#]*)')
+spreadsheet_gid = re.findall(gid_ex,fieldValues[0])
+spreadsheet_gid = int(spreadsheet_gid[0])		# make integer
+		
+#testing:		
+#print ("Reply was:", fieldValues) 
+#note: fieldValues is a list, can access with fieldValues[0] etc.
+
+
+
 
 ###############################################################################
 
-#get urls to scrape
-import re, urllib, urllib2
+
+# Get urls to scrape from a Google spreadsheet
+
+# imports
+import urllib, urllib2
 
 # Download Google spreadsheet
 class Spreadsheet(object):
@@ -38,7 +93,7 @@ class Client(object):
         source = type(self).__name__
         return self._get_auth_token(self.email, self.password, source, service="wise")
 
-    def download(self, spreadsheet, gid=1, format="csv"):
+    def download(self, spreadsheet, gid=spreadsheet_gid, format="csv"):
         url_format = "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=%s&exportFormat=%s&gid=%i"
         headers = {
             "Authorization": "GoogleLogin auth=" + self.get_auth_token(),
@@ -51,14 +106,11 @@ if __name__ == "__main__":
     import getpass
     import csv
 
-    print "\n"
-    print ">>>> First, the script will log in to Google Docs.\n"
-    email = raw_input('Please enter your Google Docs email address (e.g., leftwich@umich.edu)\nEmail: ')
-    print "\n"
-    print "Now enter your Google Docs password at the prompt."
-    password = getpass.getpass()
+
+    email = fieldValues[1]
+    password = fieldValues[3]
 	
-    spreadsheet_id = "0AinMDATKswMWdGJraFQtRTBMSWt3bFgzRjV4clZuNUE" # (spreadsheet id here)
+    spreadsheet_id = spreadsheet_key # (spreadsheet id)
 
     # Create client and spreadsheet objects
     gs = Client(email, password)
@@ -67,14 +119,18 @@ if __name__ == "__main__":
     # Request a file-like object containing the spreadsheet's contents
     csv_file = gs.download(ss)
 
+##############################################################################
 
 
-# login to CMS
+
+# Now login to CMS in case some of the pages are unpublished
+
+# imports
 import mechanize
 import cookielib
 from bs4 import BeautifulSoup
 
-#initialize variables...
+# initialize variables - this is the output if no errors occur
 error_code = "ok"
 error_args = "ok"
 
@@ -87,7 +143,6 @@ br.set_cookiejar(cj)
 
 # Browser options
 br.set_handle_equiv(True)
-#br.set_handle_gzip(True)
 br.set_handle_redirect(True)
 br.set_handle_referer(True)
 br.set_handle_robots(False)
@@ -105,30 +160,38 @@ br.open('https://weblogin.umich.edu/')
 br.select_form(nr=0)
 
 # User credentials
-br.form['login'] = 'leftwich' #umich login
-print "\n"
-print ">>>> Now, the script will log in to the CMS.\n"
-br.form['login'] = raw_input('Please enter your CMS login name (e.g., leftwich):\nLogin: ')
-print "\n"
-print "Please enter your CMS password at the prompt."
-br.form['password'] = getpass.getpass()
 
+br.form['login'] = CMS_login
+
+br.form['password'] = fieldValues[3]
 
 # Submit login
 br.submit()
 
 
-# Output
-# specify path to file and file variables
-from os.path import join as pjoin
-path_to_folder = pjoin('C:\\', 'Users', 'leftwich', 'Documents', 'scraper')
-filename = 'scraper03_test.csv'
+###########################################################################################
+
+
+# Now specify output location
+
+# imports
+import os
+path_to_folder = "c:\\" + "scraper"
+
+#check for c:\scraper, if it doesn't exist, then create it
+if not os.path.exists(path_to_folder):
+    os.makedirs(path_to_folder)
+filename = fieldValues[2]
 
 # open a file to write results in
 outputFile = open(path_to_folder + '\\' + filename, 'a')
 
 
-# now scrape for links
+###########################################################################################
+
+
+# Now scrape for links
+
 # imports		
 import csv 
 import urllib2
@@ -201,10 +264,7 @@ for url in urls:
                         error_args = str(e.reason.args)
                         						
                 #write source url, link url, error code, error arg
-                outputFile.write ('"' + (url[0]) + '","' + link.get('href')  + '","' + error_code + '","' + error_args + '"' + '\n')
-				
-    
+                outputFile.write ('"' + (url[0]) + '","' + link.get('href')  + '","' + error_code + '","' + error_args + '"' + '\n')		
 	
-
-outputFile.close()    
+outputFile.close() #end of loop   
 

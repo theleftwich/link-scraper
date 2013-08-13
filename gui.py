@@ -2,7 +2,7 @@ import easygui as eg
 
 msg         = "This program will grab links from the body and sidebars, test them, and store the information in a CSV in the C:\scraper directory."
 title       = "Link Scraper/Tester v. 0.5"
-fieldNames  = ["Google Docs Spreadsheet URL","U-M email","CMS Password"]
+fieldNames  = ["Google Docs Spreadsheet URL","U-M email address","Name of output file (must end in .csv)","CMS Password"]
 fieldValues = []  # we start with blanks for the values
 fieldValues = eg.multpasswordbox(msg,title, fieldNames)
 
@@ -25,3 +25,6 @@ while 1:  # do forever, until we find acceptable values and break out
         fieldValues = eg.multenterbox(errmsg, title, fieldNames, fieldValues)
     
 print ("Reply was:", fieldValues)
+
+#fieldValues is a list, can access with fieldValues[0] etc.
+
