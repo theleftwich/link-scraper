@@ -10,6 +10,10 @@ This link scraper will:
 
 How to use this program
 ----------------------------------
-Click on linkScraper.zip. This will take you to a page with a big gray box with a "View Raw" link in it. Right-click on that link and save it.
+Click on linkScraper.zip. This will take you to a page with a big gray box with a "View Raw" link in it. Right-click on on the "View Raw" link and save the link.
 
-You will need to have a Google spreadsheet of links you want to scrape.
+Navigate to wherever you saved the link. You should see a file called linkScraper.zip. Unzip it, open the folder, and double-click on linkScraper.exe.
+
+PLEASE READ THE DIRECTIONS IN THE DIALOG BOX. If you have a lot of links to test, the scraper may take a few minutes to run.
+
+You will need to have the URL of a Google spreadsheet of links you want to scrape.
