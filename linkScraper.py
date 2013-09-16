@@ -231,10 +231,13 @@ for url in urls:
     
                 try:		
                     pageResponse = br.open(fullURL)
-				
+                    error_code = 'ok'
+                    error_args = 'ok'
+					
                 except (mechanize.HTTPError,mechanize.URLError) as e:
                     if isinstance(e,mechanize.HTTPError):
                         error_code = str(e.code)
+
                     else:
                         error_args = str(e.reason.args)
                         						
@@ -256,6 +259,8 @@ for url in urls:
     
                 try:		
                     pageResponse = br.open(fullURL)
+                    error_code = 'ok'
+                    error_args = 'ok'
 				
                 except (mechanize.HTTPError,mechanize.URLError) as e:
                     if isinstance(e,mechanize.HTTPError):
