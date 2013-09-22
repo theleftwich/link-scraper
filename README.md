@@ -17,3 +17,8 @@ How to use this program
 3. PLEASE READ THE DIRECTIONS IN THE DIALOG BOX. If you have a lot of links to test, the scraper may take a few minutes to run.
 
 4. You will need to have the URL of a Google spreadsheet of links you want to scrape.
+
+Notes
+--------------
+
+1. The Google Spreadsheet must be available from a umich.edu account - in other words, a spreadsheet viewable by leftwich@gmail.com but not by leftwich@umich.edu WILL NOT WORK as a source of links.
